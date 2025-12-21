@@ -1,0 +1,125 @@
+<p>
+  Total de livros encontrados:
+  <strong>{{ livrosFiltrados.length }}</strong>
+</p>
+
+<h2>Biblioteca</h2>
+  <input
+    name="busca"
+    type="text"
+    placeholder="Buscar por título ou autor"
+    [(ngModel)]="termoBusca"
+    [ngModelOptions]="{ standalone: true }"
+    class="busca" 
+    />
+
+
+@for (livro of livrosFiltrados; track livro.isbn) {
+  <div
+    class=" card-body card livro-card-0" 
+    [class.indisponivel]="livro.exemplares_disponiveis === 0">
+
+    <div class="livro-capa">
+      @if (livro.imagem) {
+        <img
+          [src]="'http://localhost:3000/public/' + livro.imagem"
+          class="capa-livro"
+          alt="Capa do livro"
+        />
+      } @else {
+        <div class="capa-placeholder">
+          Sem imagem
+        </div>
+      }
+    </div>
+
+    <div class="livro-info">
+
+      <h3>{{ livro.titulo }}</h3>
+
+      <p><strong>Autor:</strong> {{ livro.autor }}</p>
+      <p><strong>ISBN:</strong> {{ livro.isbn }}</p>
+      <p><strong>Sinopse:</strong> {{ livro.sinopse }}</p>
+
+      <p>
+        <strong>Status:</strong>
+        <span
+          class="status"
+          [class.disponivel]="livro.exemplares_disponiveis > 0"
+          [class.indisponivel]="livro.exemplares_disponiveis === 0">
+          {{ livro.exemplares_disponiveis > 0 ? 'Disponível' : 'Indisponível' }}
+        </span>
+      </p>
+
+      <p>
+        <strong>Exemplares:</strong>
+        {{ livro.exemplares_disponiveis }} / {{ livro.total_exemplares }}
+      </p>
+
+      <button 
+        type="button" 
+        [class]="livro.exemplares_disponiveis > 0 ? 'btn btn-outline-success' : 'btn btn-secondary'"
+        [disabled]="livro.exemplares_disponiveis === 0"
+        data-bs-toggle="modal" 
+        [attr.data-bs-target]="'#modal' + livro.isbn">
+        @if (livro.exemplares_disponiveis > 0) {
+          Reservar
+        } @else {
+          Esgotado
+        }
+      </button>
+  </div>
+
+    <div class="modal fade" [id]="'modal' + livro.isbn" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Reservar: {{ livro.titulo }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form #formReserva="ngForm"
+            (ngSubmit)="confirmarReserva(livro, formReserva)"
+            novalidate>
+              <div class="mb-3">
+            <label class="form-label">Nome Completo</label>
+            <input 
+            type="text" 
+            class="form-control" 
+            name="nome"
+            ngModel
+            required 
+            placeholder="Digite seu nome completo">
+
+            <label class="form-label mt-2">Número de Telefone</label>
+            <input 
+            type="tel" 
+            class="form-control" 
+            name="telefone"
+            ngModel
+            required
+            placeholder="(88) 98888-8888">
+
+            <label class="form-label mt-2">E-mail</label>
+            <input 
+            type="email" 
+            class="form-control" 
+            name="email"
+            ngModel
+            required 
+            placeholder="Digite seu e-mail">
+          </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-success" [disabled]="formReserva.invalid">
+                  Confirmar Reserva
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+}
+
